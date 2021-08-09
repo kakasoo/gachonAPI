@@ -1,5 +1,14 @@
-const noticesByPage = require("./noticesByPage");
+const getNotices = require("../services/noticesByPage");
 
-const recentNotices = async (req, res, next) => noticesByPage(req, res, next);
+async function recentNotices(req, res, next) {
+    const notices = await getNotices.call(this);
+
+    res.json({
+        length: notices.length,
+        data: {
+            notices,
+        },
+    });
+}
 
 module.exports = recentNotices;

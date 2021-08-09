@@ -10,16 +10,15 @@ const types = {
     medical: /\[메디컬\] .+/,
 };
 
-const noticesByCountAndType = async (type, num) => {
-    const RegExpTypeToRequest = types[type];
+async function noticesByCountAndType(type, num) {
+    const RegExpTypeToRequest = types[type] || types["all"];
 
     let notices = [];
 
-    let page = 0;
-    while (notices.length < num) {
+    const promiseFunc = async (page) => {
         const request = await axios({
             method: "GET",
-            url: getNoticeUrl(page++),
+            url: getNoticeUrl(page),
         });
 
         const root = parse(request.data);
@@ -29,17 +28,32 @@ const noticesByCountAndType = async (type, num) => {
         const noticesHref = root.querySelectorAll(".tl>a");
         addNoticeHref(noticesHref, noticeToCount);
 
-        notices.push(
-            ...noticeToCount.filter((notice, i) => {
-                return (
-                    notice.fixed === false &&
-                    RegExpTypeToRequest.exec(notice.title)
-                );
-            })
-        );
-    }
+        const noticesToPush = noticeToCount.filter((notice) => {
+            return (
+                notice.fixed === false && RegExpTypeToRequest.exec(notice.title)
+            );
+        });
+        return noticesToPush;
+    };
 
+    let page = 0;
+    while (notices.length < num) {
+        await Promise.all([
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+            promiseFunc(page++),
+        ]).then((values) => {
+            notices.push(...values.flat(Infinity));
+        });
+    }
     return notices.filter((el, i) => i + 1 <= num);
-};
+}
 
 module.exports = noticesByCountAndType;
