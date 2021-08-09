@@ -10,6 +10,7 @@
 
 const recentNotices = require("./recentNotices");
 const noticesByPage = require("./noticesByPage");
+const serviceNoticesByPage = require("../services/noticesByPage");
 const noticesByCountAndType = require("./noticesByCountAndType");
 
 class NoticeController {
@@ -20,11 +21,28 @@ class NoticeController {
             global: { cachedTime: Date.now(), data: [] },
             medical: { cachedTime: Date.now(), data: [] },
         };
+
+        /**
+         * seed data를 넣기 위해 만든 것인데, 테러로 오해받을 수 있으니,
+         * 모든 production level에서만 사용하도록 한다.
+         */
+        // (function seedData() {
+        //     new Array(10)
+        //         .fill(0)
+        //         .map((el, i) => i)
+        //         .forEach(async (el, i) => {
+        //             serviceNoticesByPage.call(this, Number(el));
+        //         });
+        // }.bind(this)());
     }
 
     recentNotices = recentNotices.bind(this);
     noticesByPage = noticesByPage.bind(this);
     noticesByCountAndType = noticesByCountAndType.bind(this);
+
+    clearCache(name) {
+        this.setCache(name, []);
+    }
 
     setCache(name, value) {
         this.cache[name].data = value;
