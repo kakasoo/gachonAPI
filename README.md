@@ -12,7 +12,7 @@ issue에 템플릿이 있으니, 필요한 API를 issue에 작성해주세요.
 
 ## notices
 
-### /notices
+### GET /notices
 
 ```javascript
 // response
@@ -37,9 +37,20 @@ notice : {
 }
 ```
 
-### /notices/:pageNum
+### GET /notices/:pageNum
+
+> example : /notices/100
 
 -   response 형태는 /notices와 동일합니다.
 -   pageNum은 0부터 count 합니다.
     -   ex. 100페이지에 있는 공지사항들은 99를 pageNum으로 해야 합니다.
     -   pageNum이 0일 경우 /notices와 동일합니다.
+
+### GET /notices/count?num=""&type=""
+
+> example : /notices/count?num=100&type=all
+
+-   response의 형태는 /notices와 동일합니다.
+-   query로 데이터를 전달합니다.
+    -   num에는 가져올 공지의 개수, type에는 all, common, global, medical을 넣습니다.
+        -   최적화가 되지 않아 성능이 느립니다.
