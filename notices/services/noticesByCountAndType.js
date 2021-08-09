@@ -53,7 +53,16 @@ async function noticesByCountAndType(type, num) {
             notices.push(...values.flat(Infinity));
         });
     }
-    return notices.filter((el, i) => i + 1 <= num);
+    const noticesToSend = notices.filter((el, i) => i + 1 <= num);
+
+    const data = {
+        startIdx: 1,
+        endIdx: num,
+        notices: noticesToSend,
+        length: noticesToSend.length,
+    };
+
+    return data;
 }
 
 module.exports = noticesByCountAndType;

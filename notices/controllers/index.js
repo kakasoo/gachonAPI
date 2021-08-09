@@ -30,13 +30,16 @@ class NoticeController {
         this.cache[name].data = value;
     }
 
-    addCache(name, value) {
-        this.cache[name].data = value.concat(this.cache[name].data);
+    addCache(name, value, start, end) {
+        for (let i = start; i < end; i++) {
+            this.cache[name].data[i] = value[i - start];
+        }
     }
 
-    getCache(name, num) {
+    getCache(name, num = Infinity) {
         return this.cache[name].data.slice(0, num);
     }
+
     getCachedTime(name) {
         return this.cache[name].cachedTime;
     }
