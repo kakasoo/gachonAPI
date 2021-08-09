@@ -1,7 +1,10 @@
 const { default: axios } = require("axios");
 const { parse } = require("node-html-parser");
 const { getNoticeUrl, makeNoticeObj, addNoticeHref } = require("../util");
-const { maxCacheTimeout } = require("../util/constant");
+const {
+    maxCacheTimeout,
+    noticesNumberOfOnePages,
+} = require("../util/constant");
 
 async function getNotices(pageNum) {
     const request = await axios({
@@ -20,8 +23,8 @@ async function getNotices(pageNum) {
 }
 
 async function noticesByPage(pageNum = 0) {
-    const startIdx = Number(pageNum) * 23;
-    const lastIdx = (Number(pageNum) + 1) * 23;
+    const startIdx = Number(pageNum) * noticesNumberOfOnePages;
+    const lastIdx = (Number(pageNum) + 1) * noticesNumberOfOnePages;
     const allData = this.getCache("all");
 
     const cachedTime = this.getCachedTime("all");
@@ -41,6 +44,7 @@ async function noticesByPage(pageNum = 0) {
 
         if (allData[startIdx]) {
             this.clearCache("all");
+            this.getSeedData();
         }
         this.addCache("all", notices, startIdx, lastIdx);
     }
