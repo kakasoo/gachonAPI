@@ -1,8 +1,8 @@
 const express = require("express");
-const { getAllNotices } = require("./controller");
+const { recentNotices } = require("./controller");
 
 const router = express.Router();
 
-router.get("/", getAllNotices);
+router.get("/", recentNotices);
 
 module.exports = router;
