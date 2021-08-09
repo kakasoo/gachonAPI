@@ -1,6 +1,5 @@
-const { default: axios } = require("axios");
-const { parse } = require("node-html-parser");
-const { getNoticeUrl, makeNoticeObj, addNoticeHref } = require("../util");
+const { maxCacheTimeout } = require("../util/constant");
+const getNotices = require("./getNotices");
 
 // all, common, global, medical
 const types = {
@@ -10,57 +9,56 @@ const types = {
     medical: /\[메디컬\] .+/,
 };
 
+const getNoticesByType = async (page, noticeTypeRegExp) => {
+    const notices = await getNotices(page);
+    const typedNotices = notices.filter((notice) => {
+        return notice.fixed === false && noticeTypeRegExp.exec(notice.title);
+    });
+
+    return typedNotices;
+};
+
 async function noticesByCountAndType(type, num) {
-    const RegExpTypeToRequest = types[type] || types["all"];
+    const startIdx = 0;
+    const lastIdx = num - 1;
+    const noticeTypeRegExp = types[type] || types["all"];
 
-    let notices = [];
-
-    const promiseFunc = async (page) => {
-        const request = await axios({
-            method: "GET",
-            url: getNoticeUrl(page),
-        });
-
-        const root = parse(request.data);
-        const noticesData = root.querySelectorAll(".boardlist>table>tbody>tr");
-        const noticeToCount = makeNoticeObj(noticesData);
-
-        const noticesHref = root.querySelectorAll(".tl>a");
-        addNoticeHref(noticesHref, noticeToCount);
-
-        const noticesToPush = noticeToCount.filter((notice) => {
-            return (
-                notice.fixed === false && RegExpTypeToRequest.exec(notice.title)
-            );
-        });
-        return noticesToPush;
-    };
+    const typedData = this.getCachedTime(type);
+    const cachedTime = this.getCachedTime(type);
+    const isSafeCache = (Date.now() - cachedTime) / 1000 < maxCacheTimeout;
+    if (!isSafeCache) {
+        this.clearCache(type);
+    }
 
     let page = 0;
-    while (notices.length < num) {
-        await Promise.all([
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-            promiseFunc(page++),
-        ]).then((values) => {
-            notices.push(...values.flat(Infinity));
-        });
-    }
-    const noticesToSend = notices.filter((el, i) => i + 1 <= num);
+    let temp = 0;
+    if (
+        typedData.length === 0 ||
+        !isSafeCache ||
+        num > typedData.length ||
+        !typedData[startIdx]
+    ) {
+        console.log((Date.now() - cachedTime) / 1000, maxCacheTimeout);
 
-    const data = {
-        startIdx: 1,
-        endIdx: num,
-        notices: noticesToSend,
-        length: noticesToSend.length,
-    };
+        while (this.getCache(type).filter((el) => el).length < num) {
+            const promise = new Array(1).fill(5).map(
+                (el) =>
+                    new Promise((resolve, reject) => {
+                        resolve(getNoticesByType(page++, noticeTypeRegExp, el));
+                    })
+            );
+
+            await Promise.all(promise).then((res) => {
+                const values = res.flat(Infinity);
+                this.addCache(type, values, temp, temp + values.length);
+                temp += values.length;
+            });
+        }
+    }
+
+    const notices = this.getCache(type, num);
+    const length = notices.length;
+    const data = { startIdx, lastIdx, length, notices };
 
     return data;
 }

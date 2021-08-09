@@ -1,26 +1,8 @@
-const { default: axios } = require("axios");
-const { parse } = require("node-html-parser");
-const { getNoticeUrl, makeNoticeObj, addNoticeHref } = require("../util");
+const getNotices = require("./getNotices");
 const {
     maxCacheTimeout,
     noticesNumberOfOnePages,
 } = require("../util/constant");
-
-async function getNotices(pageNum) {
-    const request = await axios({
-        method: "GET",
-        url: getNoticeUrl(pageNum),
-    });
-
-    const root = parse(request.data);
-    const noticesData = root.querySelectorAll(".boardlist>table>tbody>tr");
-    const notices = makeNoticeObj(noticesData);
-
-    const noticesHref = root.querySelectorAll(".tl>a");
-    addNoticeHref(noticesHref, notices);
-
-    return notices;
-}
 
 async function noticesByPage(pageNum = 0) {
     const startIdx = Number(pageNum) * noticesNumberOfOnePages;
@@ -42,6 +24,7 @@ async function noticesByPage(pageNum = 0) {
         notices = await getNotices(pageNum);
         length = notices.length;
 
+        // lastIdx가 allData보다 크거나 캐시 시간이 끝난 상황
         if (allData[startIdx]) {
             this.clearCache("all");
             this.getSeedData();

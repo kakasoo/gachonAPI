@@ -23,6 +23,8 @@ issue에 템플릿이 있으니, 필요한 API를 issue에 작성해주세요.
 ```javascript
 // response
 {
+	startIdx : 0,
+	lastIdx : 22,
 	length : 23,
 	data : {
 		notices : [] // 아래 별도의 코드 박스에서 설명

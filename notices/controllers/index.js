@@ -55,7 +55,9 @@ class NoticeController {
 
     addCache(name, value, start, end) {
         for (let i = start; i < end; i++) {
-            this.cache[name].data[i] = value[i - start];
+            if (value[i - start]) {
+                this.cache[name].data[i] = value[i - start];
+            }
         }
         this.setNewCacheTime(name);
     }
