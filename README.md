@@ -4,7 +4,11 @@
 
 # How to use
 
-issue에 템플릿이 있으니, 필요한 API를 issue에 작성해주세요.
+> issue에 템플릿이 있으니, 필요한 API를 issue에 작성해주세요.
+
+```bash
+$ npm run start
+```
 
 # 현재 작업 완료
 
@@ -14,11 +18,16 @@ issue에 템플릿이 있으니, 필요한 API를 issue에 작성해주세요.
 
 ## 목차
 
--   최신 공지 가져오기 ( 페이지 당 23개의 데이터 )
--   특정 페이지의 공지 가져오기
--   전체, 공통, 글로벌, 메디컬을 구분하여 원하는 개수 만큼의 공지를 가져오기
+1.  ~~최신 공지 가져오기 ( 페이지 당 23개의 데이터 )~~ ( 3번으로 통합)
+2.  ~~특정 페이지의 공지 가져오기~~ (3번으로 통합)
+3.  전체, 공통, 글로벌, 메디컬 특정 페이지의 공지를 가져오기
+4.  전체, 공통, 글로벌, 메디컬을 구분하여 원하는 개수 만큼의 공지를 가져오기
 
-### GET /notices
+### GET /notices?pageNum=""&type=""
+
+> example : /notices?pageNum=0&type=all  
+> default : num : 0, type = 'all'  
+> 전체 공지의 첫 페이지를 가져오게끔 default 설정이 되어 있습니다.
 
 ```javascript
 // response
@@ -45,11 +54,6 @@ notice : {
 }
 ```
 
-### GET /notices/:pageNum
-
-> example : /notices/100
-
--   response 형태는 /notices와 동일합니다.
 -   pageNum은 0부터 count 합니다.
     -   ex. 100페이지에 있는 공지사항들은 99를 pageNum으로 해야 합니다.
     -   pageNum이 0일 경우 /notices와 동일합니다.
@@ -59,9 +63,10 @@ notice : {
 
 ### GET /notices/count?num=""&type=""
 
-> example : /notices/count?num=100&type=all
+> example : /notices/count?num=23&type=all  
+> default : num : 23, type = 'all'  
+> 전체 공지의 첫 페이지를 가져오게끔 default 설정이 되어 있습니다.
 
--   response의 형태는 /notices와 동일합니다.
 -   query로 데이터를 전달합니다.
     -   num에는 가져올 공지의 개수, type에는 all, common, global, medical을 넣습니다.
-        -   최적화가 되지 않아 성능이 느립니다.
+        -   캐시를 적용했습니다.

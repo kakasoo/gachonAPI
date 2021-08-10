@@ -1,14 +1,3 @@
-// const recentNotices = require("./recentNotices");
-// const noticesByPage = require("./noticesByPage");
-// const noticesByCountAndType = require("./noticesByCountAndType");
-
-// module.exports = {
-//     recentNotices,
-//     noticesByPage,
-//     noticesByCountAndType,
-// };
-
-const recentNotices = require("./recentNotices");
 const noticesByPage = require("./noticesByPage");
 const serviceNoticesByPage = require("../services/noticesByPage");
 const noticesByCountAndType = require("./noticesByCountAndType");
@@ -27,10 +16,9 @@ class NoticeController {
          * seed data를 넣기 위해 만든 것인데, 테러로 오해받을 수 있으니,
          * 모든 production level에서만 사용하도록 한다.
          */
-        this.getSeedData();
+        // this.getSeedData();
     }
 
-    recentNotices = recentNotices.bind(this);
     noticesByPage = noticesByPage.bind(this);
     noticesByCountAndType = noticesByCountAndType.bind(this);
 

@@ -1,28 +1,7 @@
-const { maxCacheTimeout } = require("../util/constant");
-const getNotices = require("./getNotices");
-
-// all, common, global, medical
-const types = {
-    all: /[\[공통\]|\[글로벌\]\[메디컬\]] .+/,
-    common: /\[공통\] .+/,
-    global: /\[글로벌\] .+/,
-    medical: /\[메디컬\] .+/,
-};
-
-const getNoticesByType = async (page, noticeTypeRegExp) => {
-    const notices = await getNotices(page);
-    const typedNotices = notices.filter((notice) => {
-        return notice.fixed === false && noticeTypeRegExp.exec(notice.title);
-    });
-
-    return typedNotices;
-};
+const { maxCacheTimeout, parallelRequestNum } = require("../util/constant");
+const getNotices = require("./repository/getNotices");
 
 async function noticesByCountAndType(type, num) {
-    const startIdx = 0;
-    const lastIdx = num - 1;
-    const noticeTypeRegExp = types[type] || types["all"];
-
     const typedData = this.getCachedTime(type);
     const cachedTime = this.getCachedTime(type);
     const isSafeCache = (Date.now() - cachedTime) / 1000 < maxCacheTimeout;
@@ -30,36 +9,56 @@ async function noticesByCountAndType(type, num) {
         this.clearCache(type);
     }
 
+    let discoverability = true;
     let page = 0;
     let temp = 0;
     if (
         typedData.length === 0 ||
         !isSafeCache ||
         num > typedData.length ||
-        !typedData[startIdx]
+        !typedData[0]
     ) {
-        console.log((Date.now() - cachedTime) / 1000, maxCacheTimeout);
-
-        while (this.getCache(type).filter((el) => el).length < num) {
-            const promise = new Array(1).fill(5).map(
+        loop1: while (
+            this.getCache(type).filter((el) => el).length < num &&
+            discoverability
+        ) {
+            // NOTE : 성능 개선을 위해 병렬적으로 request를 보내도록 한다.
+            const promise = new Array(parallelRequestNum).fill(0).map(
                 (el) =>
                     new Promise((resolve, reject) => {
-                        resolve(getNoticesByType(page++, noticeTypeRegExp, el));
+                        resolve(getNotices(page++, type));
                     })
             );
+            await Promise.all(promise)
+                .then((res) => {
+                    let values = res.flat(Infinity);
 
-            await Promise.all(promise).then((res) => {
-                const values = res.flat(Infinity);
-                this.addCache(type, values, temp, temp + values.length);
-                temp += values.length;
-            });
+                    if (values.length === parallelRequestNum) {
+                        const { title, date, view, fixed } = values[0];
+                        if (!title && !date && !view) {
+                            throw Error("NONE");
+                        }
+
+                        values = values.filter(
+                            (el) => el.title && el.date && el.view
+                        );
+                    }
+
+                    this.addCache(type, values, temp, temp + values.length);
+                    temp += values.length;
+                })
+                .catch((error) => {
+                    if (error.message === "NONE") {
+                        console.log("더 이상 데이터가 없습니다.");
+                        discoverability = false;
+                    }
+                });
         }
     }
 
     const notices = this.getCache(type, num);
     const length = notices.length;
-    const data = { startIdx, lastIdx, length, notices };
-
+    const data = { startIdx: 0, lastIdx: length - 1, length, notices };
     return data;
 }
 

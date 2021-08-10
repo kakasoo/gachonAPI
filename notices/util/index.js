@@ -1,8 +1,14 @@
 const replaceall = require("replaceall");
 
-const getNoticeUrl = (pageNum = 0) => {
-    const url = `https://www.gachon.ac.kr/community/opencampus/03.jsp?pageNum=${pageNum}&pageSize=20&boardType_seq=358&approve=&secret=&answer=&branch=&searchopt=&searchword=`;
-    return url;
+const getNoticeUrl = (pageNum = 0, type = "all") => {
+    return ((pageNum) => {
+        return {
+            all: `https://www.gachon.ac.kr/community/opencampus/03.jsp?pageNum=${pageNum}&pageSize=20&boardType_seq=358&approve=&secret=&answer=&branch=&searchopt=&searchword=`,
+            common: `https://www.gachon.ac.kr/community/opencampus/03.jsp?pageNum=${pageNum}&pageSize=20&boardType_seq=358&approve=&secret=&answer=&branch=1&searchopt=&searchword=`,
+            global: `https://www.gachon.ac.kr/community/opencampus/03.jsp?pageNum=${pageNum}&pageSize=20&boardType_seq=358&approve=&secret=&answer=&branch=2&searchopt=&searchword=`,
+            medical: `https://www.gachon.ac.kr/community/opencampus/03.jsp?pageNum=${pageNum}&pageSize=20&boardType_seq=358&approve=&secret=&answer=&branch=3&searchopt=&searchword=`,
+        };
+    })(pageNum)[type];
 };
 
 const makeNoticeObj = (noticesData) => {
