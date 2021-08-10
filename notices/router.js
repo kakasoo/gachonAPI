@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.get("/", controller.noticesByPage);
 router.get("/count", controller.noticesByCountAndType);
+router.get("/search", controller.noticesBySearch);
 
 module.exports = router;

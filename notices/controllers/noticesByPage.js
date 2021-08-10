@@ -4,6 +4,7 @@ const getNotices = require("../services/noticesByPage");
 async function noticesByPage(req, res, next) {
     const type = req.query.type || "all"; // all, common, global, medical
     const pageNum = req.query.pageNum || 0;
+
     const notices = await getNotices.call(this, pageNum, type);
 
     res.json({

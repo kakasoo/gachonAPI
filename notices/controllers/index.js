@@ -1,6 +1,7 @@
 const noticesByPage = require("./noticesByPage");
 const serviceNoticesByPage = require("../services/noticesByPage");
 const noticesByCountAndType = require("./noticesByCountAndType");
+const noticesBySearch = require("./noticesBySearch");
 const { noticeSeedDataNum } = require("../util/constant");
 
 class NoticeController {
@@ -16,11 +17,12 @@ class NoticeController {
          * seed data를 넣기 위해 만든 것인데, 테러로 오해받을 수 있으니,
          * 모든 production level에서만 사용하도록 한다.
          */
-        // this.getSeedData();
+        this.getSeedData();
     }
 
     noticesByPage = noticesByPage.bind(this);
     noticesByCountAndType = noticesByCountAndType.bind(this);
+    noticesBySearch = noticesBySearch.bind(this);
 
     getSeedData() {
         new Array(noticeSeedDataNum)

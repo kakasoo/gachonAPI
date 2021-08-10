@@ -5,6 +5,7 @@ const { noticesNumberOfOnePages } = require("../util/constant");
 async function noticesByCount(req, res, next) {
     const type = req.query.type || "all"; // all, common, global, medical
     const num = req.query.num || noticesNumberOfOnePages;
+
     const notices = await getNotices.call(this, type, num);
 
     res.json({

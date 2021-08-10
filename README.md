@@ -14,7 +14,7 @@ $ npm run start
 
 아직은 안정화 단계가 아니라서 api의 response가 변경될 수 있습니다.
 
-## notices
+# notices
 
 ## 목차
 
@@ -23,7 +23,7 @@ $ npm run start
 3.  전체, 공통, 글로벌, 메디컬 특정 페이지의 공지를 가져오기
 4.  전체, 공통, 글로벌, 메디컬을 구분하여 원하는 개수 만큼의 공지를 가져오기
 
-### GET /notices?pageNum=""&type=""
+## GET /notices?pageNum=""&type=""
 
 > example : /notices?pageNum=0&type=all  
 > default : num : 0, type = 'all'  
@@ -61,12 +61,51 @@ notice : {
             -   서버 가동 시 여러 페이지에 대해 데이터를 바로 캐시해둡니다.
             -   기존의 데이터와 현 데이터가 다를 경우, 캐시를 파기합니다.
 
-### GET /notices/count?num=""&type=""
+## GET /notices/count?num=""&type=""
 
 > example : /notices/count?num=23&type=all  
 > default : num : 23, type = 'all'  
 > 전체 공지의 첫 페이지를 가져오게끔 default 설정이 되어 있습니다.
 
+```javascript
+// response
+{
+	data : {
+		startIdx : 0,
+		lastIdx : 22,
+		length : 23,
+		notices : [] // 아래 별도의 코드 박스에서 설명
+	}
+}
+
+```
+
 -   query로 데이터를 전달합니다.
     -   num에는 가져올 공지의 개수, type에는 all, common, global, medical을 넣습니다.
         -   캐시를 적용했습니다.
+
+## GET /notices/search?num=""&type=""&keyword=""&from=""&to=""
+
+> example : /notices/search?num=10&type="all"&keyword="영어"&to="1"  
+> default : num : 10, type : 'all', keyword : "", to : 10  
+> 위의 값들은, 전체 공지에서 타이틀에 keyword가 포함된 것을 찾되, 0페이지에서 10페이지까지만 탐색하여 10개를 찾으란 뜻입니다.  
+> 가천대학교가 query에 한글을 base64 형태로 인코딩하지 않고 쓰고 있어, 직접 타이틀에 해당 단어를 비교연산할 수 밖에 없어 느립니다.
+
+```javascript
+// response
+{
+	data : {
+		startIdx : 0,
+		lastIdx : 22,
+		length : 23,
+		notices : [] // 아래 별도의 코드 박스에서 설명
+	}
+}
+
+```
+
+-   추후 캐시 알고리즘 사용 예정
+
+# 주의
+
+현재는 캐시를 사용해도, 새로운 게시글이 추가될 경우 캐시를 모두 파기하도록 해놓았습니다.

@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 const { parse } = require("node-html-parser");
 const { getNoticeUrl, makeNoticeObj, addNoticeHref } = require("../../util");
 
-async function getNotices(pageNum = 0, type) {
+async function getNotices(pageNum, type) {
     const request = await axios({
         method: "GET",
         url: getNoticeUrl(pageNum, type),

@@ -18,7 +18,7 @@ async function noticesByCountAndType(type, num) {
         num > typedData.length ||
         !typedData[0]
     ) {
-        loop1: while (
+        while (
             this.getCache(type).filter((el) => el).length < num &&
             discoverability
         ) {
