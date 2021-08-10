@@ -8,7 +8,6 @@ async function noticesByCount(req, res, next) {
     const notices = await getNotices.call(this, type, num);
 
     res.json({
-        length: notices.length,
         data: {
             notices,
         },

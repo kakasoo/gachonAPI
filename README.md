@@ -32,10 +32,10 @@ $ npm run start
 ```javascript
 // response
 {
-	startIdx : 0,
-	lastIdx : 22,
-	length : 23,
 	data : {
+		startIdx : 0,
+		lastIdx : 22,
+		length : 23,
 		notices : [] // 아래 별도의 코드 박스에서 설명
 	}
 }

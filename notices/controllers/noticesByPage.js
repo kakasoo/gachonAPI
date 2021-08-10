@@ -7,7 +7,6 @@ async function noticesByPage(req, res, next) {
     const notices = await getNotices.call(this, pageNum, type);
 
     res.json({
-        length: notices.length,
         data: {
             notices,
         },
